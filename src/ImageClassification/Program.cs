@@ -1,7 +1,10 @@
 ﻿using ImageClassification.Model;
+using Microsoft.ML.Transforms.TensorFlow;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using static ImageClassification.Model.ConsoleHelpers;
 
 namespace ImageClassification
 {
@@ -9,26 +12,34 @@ namespace ImageClassification
     {
         static async Task Main(string[] args)
         {
-            // Running inside Visual Studio, $SolutionDir/assets is automatically passed as argument
-            // If you execute from the console, pass as argument the location of the assets folder
-            // Otherwise, it will search for assets in the executable's folder
-            var assetsPath = args.Length > 0 ? args[0] : ModelHelpers.GetAssetsPath();
+            var assetsPath = ModelHelpers.GetAssetsPath(@"..\..\..\assets");
 
-            var tagsTsv = Path.Combine(assetsPath, "inputs", "data", "tags.tsv");
-            var imagesFolder = Path.Combine(assetsPath, "inputs", "data");
+            var tagsTsv = Path.Combine(assetsPath, "inputs", "images", "tags.tsv");
+            var imagesFolder = Path.Combine(assetsPath, "inputs", "images");
             var inceptionPb = Path.Combine(assetsPath, "inputs", "inception", "tensorflow_inception_graph.pb");
             var labelsTxt = Path.Combine(assetsPath, "inputs", "inception", "imagenet_comp_graph_label_strings.txt");
+
+            var customInceptionPb = Path.Combine(assetsPath, "inputs", "inception_custom", "model_tf.pb");
+            var customLabelsTxt = Path.Combine(assetsPath, "inputs", "inception_custom", "labels.txt");
 
             try
             {
                 var modelEvaluator = new ModelScorer(tagsTsv, imagesFolder, inceptionPb, labelsTxt);
                 modelEvaluator.Score();
+                //var modelNodes = TensorFlowUtils.GetModelNodes(customInceptionPb).ToArray();
+                //foreach (var item in modelNodes)
+                //{
+                //    Console.Out.WriteLine($"{item.Item1},{item.Item2}");
+                //}
+                //var modelEvaluatorCustom = new ModelScorerCustom(tagsTsv, imagesFolder, customInceptionPb, customLabelsTxt);
+                //modelEvaluatorCustom.Score();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
+                ConsoleWriteException(ex.Message);
             }
-            Console.ReadKey();
+
+            ConsolePressAnyKey();
         }
     }
 }
