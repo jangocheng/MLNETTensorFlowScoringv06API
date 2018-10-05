@@ -1,5 +1,4 @@
-﻿using Microsoft.ML.Data.StaticPipe.Runtime;
-using Microsoft.ML.Runtime.Api;
+﻿using Microsoft.ML.Runtime.Api;
 using System;
 using System.Collections.Generic;
 using System.IO;
